@@ -38,15 +38,19 @@ resource "azurerm_linux_function_app" "fa" {
     SecretConfig = var.secret_config
   }
 
-  identity {
-    type         = "UserAssigned"
-    identity_ids = [data.azurerm_user_assigned_identity.uai.id]
-  }
+  # If you want to assign the UAI to this resource, then you will need to create the UAI manually in Azure and uncomment the code in the data.tf file.
+  # Code below is commented so that there are less steps to do to run the code on your env.
+
+  # identity {
+  #   type         = "UserAssigned"
+  #   identity_ids = [data.azurerm_user_assigned_identity.uai.id]
+  # }
 
   site_config {}
 }
 
-resource "azurerm_user_assigned_identity" "uai_conditional" {
+# This resource should be deployed only on test env, according to 'deploy_uai' config in environment vars 
+resource "azurerm_user_assigned_identity" "uai_conditional" { 
   count               = var.deploy_uai ? 1 : 0
 
   name                = "uai-terraform-conditional-${local.resource_suffix}"
